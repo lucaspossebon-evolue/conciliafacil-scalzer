@@ -88,6 +88,9 @@ header.top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 0
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg label:has(input:checked){background:var(--navy);color:var(--surface)}
 .seg label:has(input:focus-visible){outline:3px solid var(--sky);outline-offset:-3px}
+.seg.seg2{grid-template-columns:repeat(2,1fr)}
+.lt .grp{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.lt .val.sm{width:78px}
 .seglbl{font-size:13px;color:var(--muted);margin-top:14px;display:block}
 .seghint{font-size:12.5px;color:var(--muted);margin-top:6px;min-height:2.6em}
 .bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:12px}
@@ -146,10 +149,29 @@ td.deb{color:var(--debit)}
 h3{font-size:15px;margin:22px 0 10px}
 .foot{color:var(--muted);font-size:12.5px;margin-top:30px;max-width:80ch}
 .hidden{display:none!important}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 24px;border-bottom:1px solid var(--line)}
-.tab{appearance:none;background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:10px 14px;font:inherit;font-weight:700;font-size:15px;color:var(--muted);cursor:pointer}
-.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--sky)}
+/* Cada função tem a sua cor: planilha = azul Scalzer, PDF pesquisável = verde-azulado */
+:root{--c-excel:#2DAAE1;--c-excel-soft:#E3F3FB;--c-pdf:#0F9D7A;--c-pdf-soft:#DFF4EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--c-excel:#5CC2EE;--c-excel-soft:#173247;--c-pdf:#3CCFA8;--c-pdf-soft:#123A30}}
+:root[data-theme="dark"]{--c-excel:#5CC2EE;--c-excel-soft:#173247;--c-pdf:#3CCFA8;--c-pdf-soft:#123A30}
+body[data-tab="pdf"]{--sky:var(--c-pdf);--sky-soft:var(--c-pdf-soft)}
+.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:-6px 0 22px}
+@media (max-width:640px){.tabs{grid-template-columns:1fr}}
+.tab{appearance:none;display:flex;align-items:center;gap:14px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px 16px;font:inherit;color:var(--muted);cursor:pointer;transition:border-color .15s,background .15s}
+.tab .ic{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:var(--line);color:var(--muted)}
+.tab .ic svg{width:24px;height:24px}
+.tab b{display:block;font-size:16px;color:var(--ink)}
+.tab small{display:block;font-size:13px;line-height:1.35;margin-top:2px}
+.tab:hover{border-color:var(--muted)}
+.tab[data-tab="excel"][aria-selected="true"]{border-color:var(--c-excel);background:var(--c-excel-soft)}
+.tab[data-tab="excel"][aria-selected="true"] .ic{background:var(--c-excel);color:#fff}
+.tab[data-tab="pdf"][aria-selected="true"]{border-color:var(--c-pdf);background:var(--c-pdf-soft)}
+.tab[data-tab="pdf"][aria-selected="true"] .ic{background:var(--c-pdf);color:#fff}
+.tab[aria-selected="true"] b{color:var(--navy)}
 .tab:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.modebar{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--c-pdf);background:var(--c-pdf-soft);color:var(--ink);border-radius:12px;padding:12px 16px;margin:-8px 0 22px;font-size:14px}
+.modebar svg{flex:none;width:22px;height:22px;color:var(--c-pdf);margin-top:1px}
+.modebar b{color:var(--c-pdf)}
+.modebar button{appearance:none;background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--navy);text-decoration:underline;cursor:pointer}
 body[data-tab="excel"] .only-pdf, body[data-tab="pdf"] .only-excel{display:none!important}
 .fields.two{grid-template-columns:1fr 1fr;margin-top:12px}
 @media (max-width:640px){.fields.two{grid-template-columns:1fr}}
@@ -196,15 +218,21 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
     <button class="btn ghost sm sair" id="sair" type="button" style="padding:7px 12px;font-size:13px">Sair</button>
   </header>
   <nav class="tabs" role="tablist" aria-label="Tipo de arquivo">
-    <button class="tab" role="tab" type="button" data-tab="excel" aria-selected="true">Planilha para lançamento</button>
-    <button class="tab" role="tab" type="button" data-tab="pdf" aria-selected="false">PDF pesquisável</button>
+    <button class="tab" role="tab" type="button" data-tab="excel" aria-selected="true"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg></span><span><b>Planilha para lançamento</b><small>Lê o extrato ou o relatório de títulos e gera o Excel para importar no sistema contábil</small></span></button>
+    <button class="tab" role="tab" type="button" data-tab="pdf" aria-selected="false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><circle cx="11" cy="14" r="2.5"/><path d="m13 16 2.5 2.5"/></svg></span><span><b>PDF pesquisável</b><small>Transforma o extrato escaneado ou fotografado em PDF com texto selecionável</small></span></button>
   </nav>
+  <div class="modebar only-pdf" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><circle cx="11" cy="14" r="2.5"/><path d="m13 16 2.5 2.5"/></svg><div><b>Você está no modo PDF pesquisável.</b> Aqui o resultado é um <b>PDF</b> do extrato com texto selecionável, e não a planilha de lançamentos. Para gerar o Excel, <button type="button" data-goto="excel">volte para Planilha para lançamento</button>.</div></div>
 
   <div class="grid">
     <aside>
       <section class="step">
         <h2><span class="num">1</span>Enviar as folhas</h2>
-        <p class="hint">Fotos (JPG, PNG) ou PDF. Pode mandar fora de ordem: o sistema organiza pela data e descarta folhas repetidas.</p>
+        <span class="seglbl" id="tipolbl" style="margin-top:0">Tipo de documento</span>
+        <div class="seg seg2" role="radiogroup" aria-labelledby="tipolbl" style="margin-top:6px;margin-bottom:12px">
+          <label><input type="radio" name="doctipo" value="extrato" checked>Extrato bancário</label>
+          <label><input type="radio" name="doctipo" value="titulos">Títulos por período</label>
+        </div>
+        <p class="hint" id="hint1">Fotos (JPG, PNG) ou PDF. Pode mandar fora de ordem: o sistema organiza pela data e descarta folhas repetidas.</p>
         <label class="drop" id="drop" tabindex="0">
           <strong>Clique ou arraste os arquivos aqui</strong>
           <span>Uma foto por folha, com o papel inteiro e legível</span>
@@ -223,7 +251,7 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
         </div>
         <div class="seghint" id="seghint"></div>
         <div class="row">
-          <button class="btn sky" id="read" disabled>Ler extrato</button>
+          <button class="btn sky" id="read" disabled>Ler documento</button>
           <button class="btn ghost" id="clear" disabled>Limpar tudo</button>
         </div>
         <div class="bar hidden" id="barw"><i id="bar"></i></div>
@@ -234,12 +262,12 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
     <main>
       <section class="step">
         <h2><span class="num">2</span>Conferir</h2>
-        <div id="result" class="empty"><b>Nenhum extrato lido ainda</b>Envie as folhas e clique em “Ler extrato”. A conferência dos saldos aparece aqui.</div>
+        <div id="result" class="empty"><b>Nenhum documento lido ainda</b>Escolha o tipo de documento, envie os arquivos e clique em “Ler documento”. A conferência aparece aqui.</div>
       </section>
       <section class="step">
         <h2><span class="num">3</span><span class="only-excel">Gerar a planilha</span><span class="only-pdf">Gerar o PDF pesquisável</span></h2>
         <p class="hint only-pdf">O PDF sai com o texto real (selecionável), no layout do extrato do internet banking: data, documento, histórico, valor e saldo do dia. Só é gerado quando todos os dias fecham com o extrato.</p>
-        <p class="hint only-excel">O arquivo sai com as abas Lançamentos (sem linha de total, pronta para importar) e Conferência (saldos por dia e resumo do período).</p>
+        <p class="hint only-excel" id="hint3">O arquivo sai com as abas Lançamentos (sem linha de total, pronta para importar) e Conferência (saldos por dia e resumo do período).</p>
         <div class="fields">
           <label class="field">Cliente (nome no arquivo)<input id="cliente" placeholder="Ex.: Sergio Garcia Material de Construção"></label>
           <label class="field">Data inicial do período<input id="dataIni" inputmode="numeric" placeholder="dd/mm/aaaa"></label>
@@ -258,7 +286,7 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
             <label class="field">Emissão do extrato original<input id="pEmissao" placeholder="Ex.: 05/11/2024 09:46:49"></label>
           </div>
           <div class="row">
-            <button class="btn" id="dlpdf" type="button" disabled>Baixar PDF pesquisável</button>
+            <button class="btn sky" id="dlpdf" type="button" disabled>Baixar PDF pesquisável</button>
           </div>
           <div class="msg" id="pdfmsg" role="status" aria-live="polite"></div>
         </div>
@@ -268,7 +296,7 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
   </div>
   <footer class="site">
     <div class="credit">Desenvolvido por <a class="ev" href="https://evoluetreinamento.com.br" target="_blank" rel="noopener"><span class="dot"></span>EVOLUE</a> Treinamento e Desenvolvimento · exclusivo para Scalzer Assessoria Contábil</div>
-    <div class="small">ConciliaFácil · versão 1.1</div>
+    <div class="small">ConciliaFácil · versão 1.2</div>
   </footer>
 </div>
 
@@ -326,6 +354,7 @@ let rows = [];           // assembled lançamentos
 let saldos = {};         // data -> saldo do dia (com sinal)
 let saldoAntData = "";
 let seq = 0, busy = false;
+let docTipo = "extrato";
 
 /* ---------- capabilities ---------- */
 let localMode = false;
@@ -381,7 +410,9 @@ fileIn.addEventListener("change", () => { addFiles([...fileIn.files]); fileIn.va
 async function addFiles(files){
   for (const f of files){
     try{
-      if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
+      if ((f.type === "application/pdf" || /\.pdf$/i.test(f.name)) && docTipo === "titulos") {
+        await titAddPdf(f);
+      } else if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) {
         const blobs = await pdfToImages(f);
         blobs.forEach((b,i) => pushPage(`${f.name} – pág. ${i+1}`, b));
       } else if (/^image\//.test(f.type)) {
@@ -390,6 +421,95 @@ async function addFiles(files){
     } catch(e){ setMsg(`Não foi possível abrir ${f.name}. Envie uma foto JPG/PNG ou um PDF.`, true); }
   }
   renderPages(); refreshButtons();
+}
+/* ===== Parser local do "Relatório - Títulos por Período" (PDF com texto) ===== */
+const TIT_GRUPOS_OK = ["51","58","68","215"];
+function titParsePage(items){
+  // items: [{str, x, y(top), w}]
+  const it = items.map(i => ({...i, str: i.str.replace(/\s+/g," ").trim()})).filter(i => i.str);
+  const full = it.map(i=>i.str).join(" ");
+  const res = {tipo:"titulos", periodo:null, cedente:"", grupos:[], totais:null, semTexto: it.length < 5};
+  const di = /Data Inicial:\s*(\d{2}\/\d{2}\/\d{4})/.exec(full) || null;
+  const df = /Data Final:\s*(\d{2}\/\d{2}\/\d{4})/.exec(full) || null;
+  const iniItem = it.find(i => /^Data Inicial:?$/.test(i.str)), fimItem = it.find(i => /^Data Final:?$/.test(i.str));
+  const nextOnLine = (lab) => lab ? it.filter(i => Math.abs(i.y - lab.y) < 4 && i.x > lab.x).sort((a,b)=>a.x-b.x)[0] : null;
+  const ini = di ? di[1] : (nextOnLine(iniItem)?.str.match(/\d{2}\/\d{2}\/\d{4}/)||[])[0];
+  const fim = df ? df[1] : (nextOnLine(fimItem)?.str.match(/\d{2}\/\d{2}\/\d{4}/)||[])[0];
+  if (ini || fim) res.periodo = {inicio: ini||"", fim: fim||""};
+  const ced = it.find(i => /^Cedente:?$/.test(i.str)); const cv = nextOnLine(ced); if (cv) res.cedente = cv.str;
+  // marcadores verticais: cabeçalhos de grupo, linhas (nosso número) e totais
+  const marks = [];
+  it.forEach(i => {
+    const g = /^(\d{1,3})\s*-\s*(.+)$/.exec(i.str);
+    if (g && i.x < 80 && /LIQUIDA|BAIXA/i.test(g[2])) marks.push({k:"g", y:i.y, codigo:g[1], nome:g[2].trim()});
+    else if (/^\d{5,7}-\d$/.test(i.str)) marks.push({k:"r", y:i.y, x:i.x, item:i});
+    else if (/^Total de Valores do grupo:?$/i.test(i.str)) marks.push({k:"tv", y:i.y, v: nextOnLine(i)?.str});
+    else if (/^Total de Registros do grupo:?$/i.test(i.str)) marks.push({k:"tr", y:i.y, v: nextOnLine(i)?.str});
+    else if (/^Total de Valores Liquidados:?$/i.test(i.str)) marks.push({k:"tvl", y:i.y, v: nextOnLine(i)?.str});
+    else if (/^Total de Registros Liquidados:?$/i.test(i.str)) marks.push({k:"trl", y:i.y, v: nextOnLine(i)?.str});
+  });
+  marks.sort((a,b)=>a.y-b.y);
+  const num = s => { if (s==null) return null; s=String(s).replace(/[^\d,.\-]/g,""); if(!s) return null; return Math.round(parseFloat(s.replace(/\./g,"").replace(",","."))*100)/100; };
+  let g = null; const totLiq = {};
+  const getG = (codigo,nome) => { let x = res.grupos.find(z=>z.codigo===codigo); if(!x){ x={codigo,nome,linhas:[],total_valores:null,total_registros:null}; res.grupos.push(x);} return x; };
+  marks.forEach((m, idx) => {
+    if (m.k==="g") { g = getG(m.codigo, m.nome); return; }
+    if (m.k==="tv" && g) { g.total_valores = num(m.v); return; }
+    if (m.k==="tr" && g) { g.total_registros = num(m.v); return; }
+    if (m.k==="tvl") { totLiq.valores = num(m.v); return; }
+    if (m.k==="trl") { totLiq.registros = num(m.v); return; }
+    if (m.k!=="r") return;
+    if (!g) g = getG("?", "Grupo não identificado");
+    const line = it.filter(i => Math.abs(i.y - m.y) < 3.5 && i.x > m.x - 2).sort((a,b)=>a.x-b.x);
+    const seu = line.find(i => i !== m.item && /^\d{6,}$/.test(i.str));
+    const dates = line.filter(i => /^\d{2}\/\d{2}\/\d{4}$/.test(i.str));
+    const money = line.filter(i => /^-?[\d.]+,\d{2}$/.test(i.str)).map(i=>num(i.str));
+    const prevY = idx>0 ? marks[idx-1].y : -1e9, nextY = idx<marks.length-1 ? marks[idx+1].y : 1e9;
+    const lo = Math.max(m.y - 13, (prevY + m.y)/2), hi = Math.min(m.y + 13, (nextY + m.y)/2);
+    const sac = it.filter(i => i.x < m.x - 15 && i.y > lo && i.y < hi && !/^\d/.test(i.str)).sort((a,b)=>a.y-b.y || a.x-b.x).map(i=>i.str).join(" ");
+    const [valor, mora, desc, outros, baixado] = money.length >= 5 ? money.slice(-5) : [money[0], null, null, null, money[money.length-1]];
+    g.linhas.push({sacado: sac, nosso_numero: m.item.str, seu_numero: seu ? seu.str : "", data_baixa: dates.length ? dates[dates.length-1].str : "",
+      valor, mora: mora||0, desc: desc||0, outros: outros||0, vlr_baixado: baixado, incompleto: money.length < 5 || !dates.length});
+  });
+  if (totLiq.valores != null || totLiq.registros != null) res.totais = {valores_liquidados: totLiq.valores ?? null, registros_liquidados: totLiq.registros ?? null};
+  return res;
+}
+async function titItemsFromPdfPage(page){
+  const vp = page.getViewport({scale:1});
+  const tc = await page.getTextContent();
+  const U = pdfjsLib.Util;
+  return tc.items.map(i => { const t = U.transform(vp.transform, i.transform); return {str:i.str, x:t[4], y:t[5], w:i.width}; });
+}
+
+/* PDF do relatório com texto: lê direto do arquivo, sem IA. Página sem texto (escaneada) vai para leitura por IA. */
+async function titAddPdf(file){
+  if (!window.pdfjsLib) throw new Error("pdf");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const doc = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
+  setMsg(`Lendo o PDF (${doc.numPages} página${doc.numPages>1?"s":""})…`);
+  for (let i=1;i<=doc.numPages;i++){
+    const pg = await doc.getPage(i);
+    let res = null;
+    try { res = titParsePage(await titItemsFromPdfPage(pg)); } catch(e){ res = null; }
+    const vp0 = pg.getViewport({scale:1});
+    const temLinhas = res && (res.grupos.some(g=>g.linhas.length) || res.grupos.length || res.totais);
+    if (temLinhas) {
+      const vp = pg.getViewport({scale: 120/Math.max(vp0.width, vp0.height)});
+      const c = document.createElement("canvas"); c.width = vp.width; c.height = vp.height;
+      const ctx = c.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height);
+      try { await pg.render({canvasContext:ctx, viewport:vp}).promise; } catch(e){}
+      pages.push({id:++seq, name:`${file.name} – pág. ${i}`, blob:null, thumb:c.toDataURL("image/jpeg",.7), status:"ok", result:res, error:"", dup:false, origem:"pdf"});
+    } else {
+      const vp = pg.getViewport({scale: Math.min(3, 2400/Math.max(vp0.width,vp0.height))});
+      const c = document.createElement("canvas"); c.width=vp.width; c.height=vp.height;
+      const ctx = c.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height);
+      await pg.render({canvasContext:ctx, viewport:vp}).promise;
+      await pushPage(`${file.name} – pág. ${i}`, await new Promise(r => c.toBlob(r,"image/jpeg",.9)));
+    }
+  }
+  renderPages(); assemble(); refreshButtons();
+  const pend = pages.filter(p=>p.status!=="ok").length;
+  setMsg(pend ? `${pend} página(s) sem texto: clique em “Ler documento” para ler por IA.` : "PDF lido direto do arquivo, sem uso de IA. Confira os totais ao lado.");
 }
 async function pushPage(name, blob){
   const p = {id:++seq, name, blob, thumb:"", status:"fila", result:null, error:"", dup:false};
@@ -438,6 +558,10 @@ async function pdfToImages(file){
 const statusTxt = p => p.dup ? ["dup","Repetida – ignorada"] :
   ({fila:["fila","Aguardando"], lendo:["lendo","Lendo…"], ok:["ok", okLabel(p)], erro:["erro","Erro na leitura"]})[p.status];
 function okLabel(p){
+  if (p.result?.tipo === "titulos") {
+    const n = (p.result.grupos||[]).filter(g=>TIT_GRUPOS_OK.includes(g.codigo)).reduce((a,g)=>a+g.linhas.length,0);
+    return `${n} título${n===1?"":"s"} liquidado${n===1?"":"s"}${p.origem==="pdf"?" · lido do PDF":""}`;
+  }
   const ds = (p.result?.itens||[]).filter(i=>i.tipo!=="saldo_dia").map(i=>i.data).filter(Boolean);
   const n = ds.length; if (!n) return "Lida";
   return `${n} lançamento${n>1?"s":""} · ${ds[0].slice(0,5)}${ds[n-1]!==ds[0]?" a "+ds[n-1].slice(0,5):""}`;
@@ -465,10 +589,10 @@ function pageAction(a, i){
   if (a==="up" && i>0) [pages[i-1],pages[i]]=[pages[i],pages[i-1]];
   if (a==="down" && i<pages.length-1) [pages[i+1],pages[i]]=[pages[i],pages[i+1]];
   if (a==="del") pages.splice(i,1);
-  if (a==="redo") { readPages([pages[i]], "complex"); return; }
+  if (a==="redo") { if (!pages[i].blob) { setMsg("Esta página foi lida direto do PDF e não precisa de nova leitura."); return; } readPages([pages[i]], "complex"); return; }
   renderPages(); assemble(); refreshButtons();
 }
-$("#clear").onclick = () => { if (busy) return; pages=[]; rows=[]; saldos={}; renderPages(); renderResult(); refreshButtons(); setMsg(""); $("#saldoIni").value=""; $("#dataIni").value=""; };
+$("#clear").onclick = () => { if (busy) return; pages=[]; rows=[]; saldos={}; titInfo = {periodo:null, cedente:"", grupos:{}, totais:null}; renderPages(); renderResult(); refreshButtons(); setMsg(""); $("#saldoIni").value=""; $("#dataIni").value=""; };
 const TIERS = {
   quick:{nome:"Rápida", hint:"Mais rápida e econômica. Boa para fotos retas e nítidas ou PDF do banco.", api:"claude-haiku-5-5"},
   default:{nome:"Equilibrada", hint:"Recomendada. Boa precisão com tempo moderado, inclusive em fotos um pouco tortas.", api:"claude-sonnet-5-5"},
@@ -486,7 +610,7 @@ function refreshButtons(){
   $("#read").disabled = busy || !canRead || !pages.some(p=>p.status!=="ok");
   $("#clear").disabled = busy || !pages.length;
   $("#dl").disabled = busy || !rows.length;
-  $("#dlpdf").disabled = busy || !rows.length;
+  $("#dlpdf").disabled = busy || !rows.length || docTipo === "titulos";
 }
 
 /* ---------- leitura ---------- */
@@ -494,6 +618,7 @@ const PROMPT = `Você vai transcrever UMA folha de extrato bancário (Sicoob ou 
 
 Formato:
 {"periodo": {"inicio":"dd/mm/aaaa","fim":"dd/mm/aaaa"} ou null,
+ "cabecalho": {"instituicao":"","cooperativa":"","conta":"","emissao":""} ou null,
  "saldo_anterior": {"data":"dd/mm/aaaa","valor":0.00,"dc":"C"} ou null,
  "continuacao_topo": {"nome":"","cpf_cnpj":"","complemento":""} ou null,
  "itens": [
@@ -513,7 +638,8 @@ Regras de leitura:
 9. "SALDO ANTERIOR" → saldo_anterior. Ignore "SALDO BLOQUEADO ANTERIOR", o cabeçalho, o quadro RESUMO, encargos e outras informações do final.
 10. Transcreva os textos exatamente como impressos. Não invente nada: o que não der para ler fica "".
 11. PERÍODO: se o cabeçalho trouxer o período do extrato (ex.: "Extrato de 01/12/2024 até 31/12/2024", "Período: 01/12/2024 a 31/12/2024"), preencha "periodo" com essas duas datas. Se a folha não mostrar o período, use null.
-12. DATAS DOS LANÇAMENTOS: use somente a data impressa na própria linha do lançamento. Se ela tiver dia, mês e ano, copie exatamente como dd/mm/aaaa (mês por extenso ou abreviado, como 02/DEZ/2024, vira 02/12/2024). Se a linha tiver só dia e mês, devolva "dd/mm" SEM ano: não complete o ano. NUNCA use a data ou hora de impressão/emissão do relatório (rodapé ou topo, ex.: "Emitido em", "Impresso em", "14/10/2026 14:35:07", "EXTRATOS EMITIDOS ATÉ ...") para datar lançamentos. As datas dos lançamentos são sempre sequenciais (iguais ou crescentes de cima para baixo).`;
+12. DATAS DOS LANÇAMENTOS: use somente a data impressa na própria linha do lançamento. Se ela tiver dia, mês e ano, copie exatamente como dd/mm/aaaa (mês por extenso ou abreviado, como 02/DEZ/2024, vira 02/12/2024). Se a linha tiver só dia e mês, devolva "dd/mm" SEM ano: não complete o ano. NUNCA use a data ou hora de impressão/emissão do relatório (rodapé ou topo, ex.: "Emitido em", "Impresso em", "14/10/2026 14:35:07", "EXTRATOS EMITIDOS ATÉ ...") para datar lançamentos. As datas dos lançamentos são sempre sequenciais (iguais ou crescentes de cima para baixo).
+13. CABEÇALHO: se a folha mostrar o cabeçalho do extrato, preencha "cabecalho" com a instituição (ex.: "SICOOB"), a cooperativa/agência (ex.: "3007-4 / SICOOB CONEXAO"), a conta e o titular (ex.: "52.304-6 / DRAGO CARVAO LTDA") e a data/hora de emissão do extrato, como impressos. Se não aparecer, use null.`;
 
 async function readPages(list, tier){
   if ((!sample && !localMode) || busy || !list.length) return;
@@ -540,7 +666,7 @@ async function readPages(list, tier){
           res = await sample.json(PROMPT, opts);
         }
         if (!res || !Array.isArray(res.itens)) throw {code:"invalid_json"};
-        p.result = normalize(res); p.status="ok";
+        p.result = docTipo === "titulos" ? normalizeTit(res) : normalize(res); p.status="ok";
       } catch(e){
         p.status="erro"; p.error = errText(e?.code);
         if (e?.code==="senha" || e?.code==="chave" || e?.code==="credito" || e?.code==="limite" || e?.code==="config" || e?.code==="not_granted" || e?.code==="sampling_disabled" || e?.code==="session_expired") stop = true;
@@ -552,7 +678,7 @@ async function readPages(list, tier){
   };
   await Promise.all([worker(), worker()]);
   busy = false;
-  autoOrder(); renderPages(); assemble(); refreshButtons();
+  if (docTipo !== "titulos") autoOrder(); renderPages(); assemble(); refreshButtons();
   if (localMode && pages.some(p=>p.error && /Senha de acesso/.test(p.error))) { try { localStorage.removeItem("scalzer_acesso"); } catch(e){} $("#gate").classList.remove("hidden"); $("#gateMsg").textContent = "A senha mudou. Digite a nova senha."; }
   const errs = pages.filter(p=>p.status==="erro").length;
   setMsg(errs ? `${errs} folha(s) com erro. Use ↻ na folha para ler novamente.` : "Leitura concluída. Confira os saldos ao lado.", !!errs);
@@ -563,7 +689,7 @@ async function apiRead(blob, tier){
   let resp;
   try {
     resp = await fetch(FUNCAO + "/ler", {method:"POST", headers:{"content-type":"application/json", "x-acesso": $("#apikey").value.trim()},
-      body: JSON.stringify({imagem: b64, tipo: blob.type || "image/jpeg", modo: tier})});
+      body: JSON.stringify({imagem: b64, tipo: blob.type || "image/jpeg", modo: tier, documento: docTipo})});
   } catch(e){ throw {code:"network"}; }
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw {code: data.codigo || "api"};
@@ -611,7 +737,9 @@ function normalize(res){
 }
 
 /* ---------- montagem ---------- */
-function sig(p){ return (p.result?.itens||[]).map(i=>`${i.tipo}|${i.data}|${i.valor}|${i.dc}`).join(";"); }
+function sig(p){
+  if (p.result?.tipo === "titulos") return (p.result.grupos||[]).flatMap(g=>g.linhas.map(l=>`${g.codigo}|${l.nosso_numero}|${l.seu_numero}|${l.vlr_baixado}`)).join(";");
+  return (p.result?.itens||[]).map(i=>`${i.tipo}|${i.data}|${i.valor}|${i.dc}`).join(";"); }
 function pageKeys(p){
   const ds = (p.result?.itens||[]).map(i=>dkey(i.data)).filter(k=>k!=="99999999");
   return ds.length ? [ds[0], ds[ds.length-1]] : ["99999999","99999999"];
@@ -631,6 +759,7 @@ let uidSeq = 0, onlyPend = false;
 const rowKey = r => `${r.data}|${r.doc}|${r.valor}|${r.dc}|${r.nome}`;
 function sortByDate(){ rows.sort((a,b)=> dkey(a.data).localeCompare(dkey(b.data)) || (a.uid||0)-(b.uid||0)); }
 function assemble(){
+  if (docTipo === "titulos") return assembleTit();
   const oldRows = rows;
   rows = []; saldos = {}; let sAnt = null; saldoAntData = ""; periodoIni = ""; periodoFim = "";
   const seen = new Set(); let folha = 0;
@@ -763,7 +892,8 @@ function reasons(r, badDates, i, pb){
 }
 function renderResult(){
   const box = $("#result");
-  if (!rows.length){ box.className="empty"; box.innerHTML = `<b>Nenhum extrato lido ainda</b>Envie as folhas e clique em “Ler extrato”. A conferência dos saldos aparece aqui.`; refreshButtons(); return; }
+  if (docTipo === "titulos") return renderTit();
+  if (!rows.length){ box.className="empty"; box.innerHTML = `<b>Nenhum documento lido ainda</b>Escolha o tipo de documento, envie os arquivos e clique em “Ler documento”. A conferência aparece aqui.`; refreshButtons(); return; }
   box.className = "";
   const R = recon();
   const bad = R.days.filter(x=>x.diff!==null && x.diff!==0);
@@ -848,6 +978,238 @@ function renderResult(){
   $("#apAll").onclick = () => { rows.forEach((r,i)=>{ if (info[i].length) r.aprovado = true; }); rerender(); };
   $("#onlyPend").onchange = e => { onlyPend = e.target.checked; rerender(); };
   refreshButtons();
+}
+
+/* ---------- Títulos por período ---------- */
+let titInfo = {periodo:null, cedente:"", grupos:{}, totais:null};
+const TIT_NOMES = {"51":"Liquidação – via caixa/dinheiro","58":"Liquidação – via compensação","68":"Liquidação – débito em conta","215":"Liquidação cobrança – Intercredis"};
+function applyTipo(){
+  const t = docTipo === "titulos";
+  $("#hint1").textContent = t
+    ? "PDF do “Relatório – Títulos por Período” (Sicoob). O PDF é lido direto do arquivo, sem IA. Fotos do relatório também funcionam (leitura por IA). Entram só os grupos 51, 58, 68 e 215 (liquidações)."
+    : "Fotos (JPG, PNG) ou PDF. Pode mandar fora de ordem: o sistema organiza pela data e descarta folhas repetidas.";
+  $("#hint3").textContent = t
+    ? "O arquivo sai com a aba Títulos (Dt. Baixa, Sacado/Cliente, Seu Número, Valor, Vlr Mora, Vlr Desc., Vlr Baixado, sem linha de total) e a aba Conferência (totais por grupo comparados com o relatório)."
+    : "O arquivo sai com as abas Lançamentos (sem linha de total, pronta para importar) e Conferência (saldos por dia e resumo do período).";
+  [$("#dataIni"), $("#saldoIni")].forEach(el => el.closest("label").classList.toggle("hidden", t));
+  const pm = $("#pdfmsg"); if (pm) { pm.textContent = t ? "O PDF pesquisável vale só para extrato bancário. Para o relatório de títulos, use a aba “Planilha para lançamento”." : ""; pm.classList.toggle("err", t); }
+}
+document.querySelectorAll('input[name="doctipo"]').forEach(r => r.addEventListener("change", () => {
+  if (busy) { document.querySelector(`input[name="doctipo"][value="${docTipo}"]`).checked = true; return; }
+  docTipo = document.querySelector('input[name="doctipo"]:checked').value;
+  try { localStorage.setItem("scalzer_doctipo", docTipo); } catch(e){}
+  const tinha = pages.length || rows.length;
+  pages = []; rows = []; saldos = {}; titInfo = {periodo:null, cedente:"", grupos:{}, totais:null};
+  $("#saldoIni").value = ""; $("#dataIni").value = "";
+  applyTipo(); renderPages(); renderResult(); refreshButtons();
+  setMsg(tinha ? "Tipo de documento alterado: a lista foi limpa. Envie os arquivos do novo tipo." : "");
+}));
+try { const t = localStorage.getItem("scalzer_doctipo"); if (t === "titulos" || t === "extrato") { docTipo = t; document.querySelector(`input[name="doctipo"][value="${t}"]`).checked = true; } } catch(e){}
+applyTipo();
+
+function normalizeTit(res){
+  const n = v => { const x = parseNum(v); return isNaN(x) ? 0 : r2(x); };
+  const grupos = (res.grupos||[]).map(g => ({
+    codigo: String(g.codigo ?? "").replace(/\D/g,"") || "?", nome: String(g.nome||"").trim(),
+    total_valores: g.total_valores==null || g.total_valores==="" ? null : n(g.total_valores),
+    total_registros: g.total_registros==null || g.total_registros==="" ? null : n(g.total_registros),
+    linhas: (g.linhas||[]).map(l => ({sacado:String(l.sacado||"").trim(), nosso_numero:String(l.nosso_numero||"").trim(), seu_numero:String(l.seu_numero||"").trim(),
+      data_baixa:String(l.data_baixa||"").trim(), valor:n(l.valor), mora:n(l.mora), desc:n(l.desc), outros:n(l.outros), vlr_baixado:n(l.vlr_baixado), incompleto:false}))
+  }));
+  const per = res.periodo && (res.periodo.inicio || res.periodo.fim) ? {inicio:String(res.periodo.inicio||""), fim:String(res.periodo.fim||"")} : null;
+  const tt = res.totais ? {valores_liquidados: res.totais.valores_liquidados==null?null:n(res.totais.valores_liquidados), registros_liquidados: res.totais.registros_liquidados==null?null:n(res.totais.registros_liquidados)} : null;
+  return {tipo:"titulos", periodo:per, cedente:String(res.cedente||""), grupos, totais:tt};
+}
+function assembleTit(){
+  const oldRows = rows; rows = []; periodoIni = ""; periodoFim = "";
+  titInfo = {periodo:null, cedente:"", grupos:{}, totais:null};
+  const seen = new Set(); let folha = 0;
+  pages.forEach(p => {
+    p.dup = false;
+    if (p.status !== "ok" || p.result?.tipo !== "titulos") return;
+    const sg = sig(p); if (sg && seen.has(sg)) { p.dup = true; return; } seen.add(sg); folha++;
+    const r = p.result;
+    if (r.periodo && !titInfo.periodo) titInfo.periodo = {inicio: normDate(r.periodo.inicio), fim: normDate(r.periodo.fim)};
+    if (r.cedente && !titInfo.cedente) titInfo.cedente = r.cedente;
+    if (r.totais) titInfo.totais = r.totais;
+    r.grupos.forEach(g => {
+      const G = titInfo.grupos[g.codigo] || (titInfo.grupos[g.codigo] = {nome: g.nome, tv:null, tr:null, lidos:0, soma:0});
+      if (g.total_valores != null) G.tv = g.total_valores;
+      if (g.total_registros != null) G.tr = g.total_registros;
+      G.lidos += g.linhas.length; G.soma = r2(G.soma + g.linhas.reduce((a,l)=>a+l.vlr_baixado,0));
+      if (!TIT_GRUPOS_OK.includes(g.codigo)) return;
+      g.linhas.forEach(l => rows.push({grupo:g.codigo, folha, data: normDate(l.data_baixa, titInfo.periodo?.inicio), sacado:l.sacado, seu:l.seu_numero, nosso:l.nosso_numero,
+        valor:l.valor, mora:l.mora, desc:l.desc, outros:l.outros, baixado:l.vlr_baixado, incompleto:!!l.incompleto}));
+    });
+  });
+  if (titInfo.periodo){ periodoIni = titInfo.periodo.inicio; periodoFim = titInfo.periodo.fim; const di = $("#dataIni"); if (!di.value || di.dataset.auto==="1") { di.value = periodoIni; di.dataset.auto="1"; } }
+  const prevAp = {};
+  oldRows.forEach(o => { if (o.aprovado){ const k = titKey(o); prevAp[k] = (prevAp[k]||0)+1; } });
+  rows.forEach(x => { x.uid = ++uidSeq; const k = titKey(x); if (prevAp[k]) { x.aprovado = true; prevAp[k]--; } else x.aprovado = false; });
+  sortByDate();
+  renderPages(); renderResult();
+}
+const titKey = r => `${r.grupo}|${r.nosso}|${r.seu}|${r.baixado}`;
+function titCheck(){
+  const porGrupo = TIT_GRUPOS_OK.filter(c => titInfo.grupos[c] || rows.some(r=>r.grupo===c)).map(c => {
+    const rs = rows.filter(r=>r.grupo===c), G = titInfo.grupos[c] || {};
+    const soma = r2(rs.reduce((a,r)=>a+r.baixado,0));
+    const okV = G.tv==null ? null : Math.abs(soma - G.tv) < 0.005, okN = G.tr==null ? null : rs.length === G.tr;
+    return {codigo:c, nome: G.nome || TIT_NOMES[c] || "", lidos: rs.length, rel: G.tr, soma, relV: G.tv, ok: okV!==false && okN!==false, conferivel: G.tv!=null || G.tr!=null};
+  });
+  const tot = {n: rows.length, valor: r2(rows.reduce((a,r)=>a+r.valor,0)), mora: r2(rows.reduce((a,r)=>a+r.mora,0)), desc: r2(rows.reduce((a,r)=>a+r.desc,0)), baixado: r2(rows.reduce((a,r)=>a+r.baixado,0))};
+  const rel = titInfo.totais;
+  const okTot = rel && rel.valores_liquidados!=null ? Math.abs(tot.baixado - rel.valores_liquidados) < 0.005 && (rel.registros_liquidados==null || rel.registros_liquidados===tot.n) : null;
+  const ignorados = Object.entries(titInfo.grupos).filter(([c]) => !TIT_GRUPOS_OK.includes(c));
+  return {porGrupo, tot, rel, okTot, ignorados};
+}
+function titReasons(r, i, pb, badGroups){
+  const w = [];
+  if (r.aprovado) return w;
+  const k = ymd(r.data);
+  if (!k) w.push("Data inválida (use dd/mm/aaaa)");
+  else if (pb && (k < pb[0] || k > pb[1])) w.push("Data fora do período do relatório");
+  if (!r.sacado) w.push("Sacado não lido");
+  if (r.incompleto) w.push("Linha incompleta na leitura");
+  if (Math.abs(r.valor + r.mora - r.desc + (r.outros||0) - r.baixado) > 0.005) w.push("Valor + mora − desconto ≠ valor baixado");
+  if (badGroups.has(r.grupo)) w.push(`Grupo ${r.grupo} não fecha com o total do relatório`);
+  return w;
+}
+function renderTit(){
+  const box = $("#result");
+  if (!rows.length && !Object.keys(titInfo.grupos).length){ box.className="empty"; box.innerHTML = `<b>Nenhum relatório lido ainda</b>Envie o PDF do “Relatório – Títulos por Período”. Os totais por grupo aparecem aqui para conferência.`; refreshButtons(); return; }
+  box.className = "";
+  const C = titCheck();
+  const badGroups = new Set(C.porGrupo.filter(g=>!g.ok).map(g=>g.codigo));
+  const pb = titInfo.periodo && ymd(titInfo.periodo.inicio) && ymd(titInfo.periodo.fim) ? [ymd(titInfo.periodo.inicio), ymd(titInfo.periodo.fim)] : null;
+  const info = rows.map((r,i) => titReasons(r, i, pb, badGroups));
+  const nPend = info.filter(w=>w.length).length, nAp = rows.filter(r=>r.aprovado).length;
+  let v;
+  if (badGroups.size || C.okTot === false) v = `<div class="verdict bad"><div><b>Os totais não fecham com o relatório</b>Veja os grupos em destaque. Normalmente falta uma página ou um valor foi lido errado. Os títulos desses grupos estão marcados como pendentes.</div></div>`;
+  else if (C.porGrupo.some(g=>g.conferivel) || C.okTot) v = `<div class="verdict ok"><div><b>Todos os grupos conferem com o relatório</b>${C.tot.n} títulos liquidados, total de ${brl(C.tot.baixado)}${C.okTot ? " – igual ao “Total de Valores Liquidados” do relatório" : ""}.</div></div>`;
+  else v = `<div class="verdict bad"><div><b>Sem totais do relatório para comparar</b>As páginas com “Total de Valores do grupo” não foram enviadas. Envie o relatório completo para conferir.</div></div>`;
+  const pendMsg = nPend ? `<div class="verdict bad" style="background:var(--warn-soft);color:var(--warn)"><div><b>${nPend} título(s) pendente(s)</b>Confira, ajuste se precisar e clique em ✓ para aprovar.</div></div>` : "";
+  const ign = C.ignorados.length ? `<p class="hint" style="margin:0 0 14px">Não considerados (não são liquidação): ${C.ignorados.map(([c,G]) => `${esc(c)} – ${esc(G.nome)} (${G.lidos} título${G.lidos===1?"":"s"}, ${brl(G.soma)})`).join("; ")}.</p>` : "";
+  const per = titInfo.periodo ? `${titInfo.periodo.inicio} a ${titInfo.periodo.fim}` : "–";
+  box.innerHTML = `${v}${pendMsg}
+  <div class="summary">
+    <div><span>Período</span><b style="font-size:15px">${per}</b></div>
+    <div><span>Títulos liquidados</span><b>${C.tot.n}</b></div>
+    <div><span>Valor (R$)</span><b>${brl(C.tot.valor)}</b></div>
+    <div><span>Vlr Baixado</span><b>${brl(C.tot.baixado)}</b></div>
+    <div><span>Vlr Mora</span><b>${brl(C.tot.mora)}</b></div>
+    <div><span>Vlr Desc.</span><b>${brl(C.tot.desc)}</b></div>
+    <div><span>Pendentes</span><b style="color:var(--warn)">${nPend}</b></div>
+    <div><span>Aprovados</span><b style="color:var(--ok)">${nAp}</b></div>
+  </div>
+  ${ign}
+  <h3>Conferência por grupo</h3>
+  <div class="tblwrap"><table><thead><tr><th>Grupo</th><th class="n">Títulos lidos</th><th class="n">No relatório</th><th class="n">Vlr baixado lido</th><th class="n">Total no relatório</th><th class="n">Diferença</th></tr></thead><tbody>
+  ${C.porGrupo.map(g=>`<tr class="${g.ok?"":"bad"}"><td>${esc(g.codigo)} – ${esc(TIT_NOMES[g.codigo]||g.nome)}</td><td class="n">${g.lidos}</td><td class="n">${g.rel??"–"}</td><td class="n">${brl(g.soma)}</td><td class="n">${g.relV==null?"–":brl(g.relV)}</td><td class="n ${g.relV==null?"":g.ok?"st-ok":"st-bad"}">${g.relV==null?"–":g.ok?"✓ 0,00":brl(r2(g.soma-g.relV))}</td></tr>`).join("")}
+  ${C.rel && C.rel.valores_liquidados!=null ? `<tr><td><b>Total liquidado</b></td><td class="n"><b>${C.tot.n}</b></td><td class="n"><b>${C.rel.registros_liquidados??"–"}</b></td><td class="n"><b>${brl(C.tot.baixado)}</b></td><td class="n"><b>${brl(C.rel.valores_liquidados)}</b></td><td class="n ${C.okTot?"st-ok":"st-bad"}">${C.okTot?"✓ 0,00":brl(r2(C.tot.baixado-C.rel.valores_liquidados))}</td></tr>` : ""}
+  </tbody></table></div>
+  <h3>Títulos (${rows.length})</h3>
+  <div class="toolbar">
+    <button class="btn ghost sm" id="sortDate">Ordenar por data</button>
+    <button class="btn ghost sm" id="apAll" ${nPend?"":"disabled"}>Aprovar todos os pendentes</button>
+    <label><input type="checkbox" id="onlyPend" ${onlyPend?"checked":""}> Mostrar só pendentes</label>
+    <span class="cnt"><b>${nPend}</b> pendente(s) · <b>${nAp}</b> aprovado(s) · use ↑ ↓ para mudar a sequência</span>
+  </div>
+  <div class="tblwrap lt"><table><thead><tr><th>#</th><th>Status</th><th>Dt. Baixa</th><th>Sacado / Cliente</th><th>Seu Número / Nº documento</th><th class="n">Valor (R$)</th><th class="n">Vlr Mora</th><th class="n">Vlr Desc.</th><th class="n">Vlr Baixado</th><th>Grupo</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>`;
+  const tb = $("#ltb");
+  tb.innerHTML = rows.map((r,i)=>{
+    const w = info[i];
+    if (onlyPend && !w.length) return "";
+    const st = r.aprovado ? ["aprov","Aprovado"] : w.length ? ["pend","Pendente"] : ["conf","Conferido"];
+    const money = (f) => `<td class="n"><input class="val sm" data-i="${i}" data-f="${f}" value="${brl(r[f])}" inputmode="decimal" aria-label="${f}"></td>`;
+    return `<tr class="${st[0]==="conf"?"":st[0]}">
+    <td class="n">${i+1}</td>
+    <td><span class="badge ${st[0]}">${st[1]}</span>${w.length?`<span class="why">${esc(w.join(" · "))}</span>`:""}</td>
+    <td><input class="date" data-i="${i}" data-f="data" value="${esc(r.data)}" placeholder="dd/mm/aaaa" aria-label="Data da baixa"></td>
+    <td><input class="name" data-i="${i}" data-f="sacado" value="${esc(r.sacado)}" aria-label="Sacado"></td>
+    <td><input data-i="${i}" data-f="seu" value="${esc(r.seu)}" aria-label="Seu número" style="min-width:120px"></td>
+    ${money("valor")}${money("mora")}${money("desc")}${money("baixado")}
+    <td class="grp" title="${esc(TIT_NOMES[r.grupo]||"")}">${esc(r.grupo)}</td>
+    <td><div class="rowacts">
+      <button class="icon" data-act="up" data-i="${i}" title="Subir" aria-label="Subir título ${i+1}" ${i===0?"disabled":""}>↑</button>
+      <button class="icon" data-act="down" data-i="${i}" title="Descer" aria-label="Descer título ${i+1}" ${i===rows.length-1?"disabled":""}>↓</button>
+      <button class="icon ap" data-act="ap" data-i="${i}" title="${r.aprovado?"Desfazer aprovação":"Aprovar"}" aria-label="${r.aprovado?"Desfazer aprovação do":"Aprovar"} título ${i+1}">${r.aprovado?"↺":"✓"}</button>
+      <button class="icon" data-act="del" data-i="${i}" title="Excluir" aria-label="Excluir título ${i+1}">✕</button>
+    </div></td></tr>`;}).join("") || `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:18px">Nenhum título ${onlyPend?"pendente":"liquidado encontrado"}.</td></tr>`;
+  const rerender = (focusSel) => { const y = window.scrollY; const sc = $(".lt")?.scrollTop||0; renderTit(); window.scrollTo(0,y); const lt=$(".lt"); if (lt) lt.scrollTop = sc; if (focusSel) { const el = document.querySelector(focusSel); if (el) el.focus(); } };
+  tb.querySelectorAll("input").forEach(el => el.addEventListener("change", () => {
+    const r = rows[+el.dataset.i], f = el.dataset.f;
+    if (["valor","mora","desc","baixado"].includes(f)){ const n = parseNum(el.value); if (!isNaN(n)) r[f] = r2(Math.abs(n)); }
+    else if (f==="data"){ r.data = normDate(el.value, titInfo.periodo?.inicio || anchorDate()); }
+    else { r[f] = el.value.trim(); }
+    r.incompleto = false; rerender();
+  }));
+  tb.querySelectorAll("button[data-act]").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, a = b.dataset.act;
+    if (a==="up" && i>0){ [rows[i-1],rows[i]]=[rows[i],rows[i-1]]; return rerender(`button[data-act="up"][data-i="${i-1}"]`); }
+    if (a==="down" && i<rows.length-1){ [rows[i+1],rows[i]]=[rows[i],rows[i+1]]; return rerender(`button[data-act="down"][data-i="${i+1}"]`); }
+    if (a==="ap"){ rows[i].aprovado = !rows[i].aprovado; return rerender(); }
+    if (a==="del"){ rows.splice(i,1); return rerender(); }
+  });
+  $("#sortDate").onclick = () => { sortByDate(); rerender("#sortDate"); const b = $("#sortDate"); if (b){ b.textContent = "Ordenado ✓"; setTimeout(()=>{ if (b.isConnected) b.textContent = "Ordenar por data"; }, 1500); } };
+  $("#apAll").onclick = () => { rows.forEach((r,i)=>{ if (info[i].length) r.aprovado = true; }); rerender(); };
+  $("#onlyPend").onchange = e => { onlyPend = e.target.checked; rerender(); };
+  refreshButtons();
+}
+async function buildXlsxTit(){
+  const C = titCheck();
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet("Títulos", {views:[{state:"frozen",ySplit:4}]});
+  const cli = $("#cliente").value.trim();
+  ws.getCell("A1").value = `Relatório de Títulos por Período – liquidações${cli?" – "+cli:""}`; ws.getCell("A1").font = fnt({bold:true,size:13});
+  ws.getCell("A2").value = `${titInfo.cedente?"Cedente: "+titInfo.cedente+". ":""}Período ${titInfo.periodo?titInfo.periodo.inicio+" a "+titInfo.periodo.fim:""}. Grupos considerados: 51, 58, 68 e 215.`;
+  ws.getCell("A2").font = fnt({italic:true,size:9,color:"FF595959"});
+  const heads = ["Dt. Baixa","Sacado / Cliente","Seu Número / Nº documento","Valor (R$)","Vlr Mora","Vlr Desc.","Vlr Baixado"];
+  const widths = [12,48,24,14,12,12,14];
+  heads.forEach((h,i)=>{ const c=ws.getCell(4,i+1); c.value=h; c.font=fnt({bold:true,color:"FFFFFFFF"}); c.fill=fill("FF1F4E78"); c.alignment={horizontal:"center",vertical:"middle",wrapText:true}; c.border=BD; ws.getColumn(i+1).width=widths[i]; });
+  let r = 5;
+  rows.forEach(x => {
+    const vals = [toDate(x.data), x.sacado, x.seu || null, x.valor, x.mora, x.desc, x.baixado];
+    vals.forEach((v,i)=>{ const c=ws.getCell(r,i+1); c.value=v; c.font=fnt(); c.border=BD; if (i>=3) c.numFmt=MONEY; });
+    ws.getCell(r,1).numFmt="dd/mm/yyyy"; ws.getCell(r,3).numFmt="@";
+    r++;
+  });
+  const last = Math.max(r-1, 5);
+  ws.autoFilter = `A4:G${last}`;
+
+  const c2 = wb.addWorksheet("Conferência", {views:[{state:"frozen",ySplit:4}]});
+  c2.getCell("A1").value = "Conferência com os totais do relatório"; c2.getCell("A1").font = fnt({bold:true,size:13});
+  c2.getCell("A2").value = "Totais do relatório digitados do PDF (azul). Valores lidos somados a partir da aba Títulos.";
+  c2.getCell("A2").font = fnt({italic:true,size:9,color:"FF595959"});
+  const h2 = ["Grupo","Descrição","Títulos lidos","No relatório","Vlr baixado lido","Total no relatório","Diferença"];
+  [10,40,14,14,18,18,14].forEach((w,i)=>c2.getColumn(i+1).width=w);
+  h2.forEach((h,i)=>{ const c=c2.getCell(4,i+1); c.value=h; c.font=fnt({bold:true,color:"FFFFFFFF"}); c.fill=fill("FF1F4E78"); c.alignment={horizontal:"center",vertical:"middle",wrapText:true}; c.border=BD; });
+  let rr = 5;
+  C.porGrupo.forEach(g => {
+    const vals = [g.codigo, TIT_NOMES[g.codigo]||g.nome, g.lidos, g.rel, g.soma, g.relV, null];
+    vals.forEach((v,i)=>{ const c=c2.getCell(rr,i+1); c.value=v; c.border=BD; c.font=fnt({color: (i===3||i===5) ? "FF0000FF" : "FF000000"}); if (i>=4) c.numFmt=MONEY; });
+    if (g.relV!=null) c2.getCell(rr,7).value = {formula:`ROUND(E${rr}-F${rr},2)`, result: r2(g.soma-g.relV)}; else c2.getCell(rr,7).value = "–";
+    rr++;
+  });
+  const lg = rr-1;
+  c2.getCell(rr,1).value = "TOTAL"; c2.getCell(rr,3).value = {formula:`SUM(C5:C${lg})`, result:C.tot.n};
+  c2.getCell(rr,5).value = {formula:`SUM(E5:E${lg})`, result:C.tot.baixado};
+  if (C.rel && C.rel.valores_liquidados!=null){ c2.getCell(rr,4).value = C.rel.registros_liquidados; c2.getCell(rr,6).value = C.rel.valores_liquidados; c2.getCell(rr,7).value = {formula:`ROUND(E${rr}-F${rr},2)`, result:r2(C.tot.baixado-C.rel.valores_liquidados)}; }
+  for (let col=1; col<=7; col++){ const c=c2.getCell(rr,col); c.fill=fill("FFD9E1F2"); c.border=BD; c.font=fnt({bold:true, color:(col===4||col===6)?"FF0000FF":"FF000000"}); if (col>=5) c.numFmt=MONEY; }
+  const tr = rr;
+  rr += 2;
+  c2.getCell(rr,1).value = "Totais da aba Títulos"; c2.getCell(rr,1).font = fnt({bold:true}); rr++;
+  [["Valor (R$)","D",C.tot.valor],["Vlr Mora","E",C.tot.mora],["Vlr Desc.","F",C.tot.desc],["Vlr Baixado","G",C.tot.baixado]].forEach(([lab,col,res]) => {
+    const a=c2.getCell(rr,2), b=c2.getCell(rr,5); a.value=lab; a.font=fnt(); a.border=BD;
+    b.value={formula:`SUM('Títulos'!${col}5:${col}${last})`, result:res}; b.numFmt=MONEY; b.font=fnt(); b.border=BD; rr++;
+  });
+  if (C.ignorados.length){
+    rr++; c2.getCell(rr,1).value = "Não considerados (não são liquidação): " + C.ignorados.map(([c,G]) => `${c} – ${G.nome} (${G.lidos} título${G.lidos===1?"":"s"}, R$ ${brl(G.soma)})`).join("; ");
+    c2.getCell(rr,1).font = fnt({italic:true,size:9,color:"FF595959"}); rr++;
+  }
+  c2.getCell(rr+1,1).value = "Gerado pelo ConciliaFácil – desenvolvido pela Evolue Treinamento e Desenvolvimento."; c2.getCell(rr+1,1).font = fnt({italic:true,size:9,color:"FF595959"});
+  const buf = await wb.xlsx.writeBuffer();
+  return new Blob([buf], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
 
 /* ---------- Excel ---------- */
@@ -937,6 +1299,11 @@ async function buildXlsx(){
   return new Blob([buf], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 }
 function fileName(){
+  if (docTipo === "titulos") {
+    const cli = $("#cliente").value.trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_|_$/g,"").toLowerCase();
+    const p = (titInfo.periodo?.inicio || rows.find(r=>ymd(r.data))?.data || "").slice(3).replace("/","-") || "periodo";
+    return `titulos_${cli?cli+"_":""}${p}.xlsx`;
+  }
   const R = recon();
   const cli = $("#cliente").value.trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_|_$/g,"").toLowerCase();
   const p = R.days.length ? R.days[0].d.slice(3).replace("/","-") : "extrato";
@@ -952,6 +1319,7 @@ function setTab(t){
 const tituloOrig = document.title;
 document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => { setTab(b.dataset.tab); try { history.replaceState(null, "", "#" + b.dataset.tab); } catch(e){} }));
 window.addEventListener("hashchange", () => setTab(location.hash.slice(1)));
+document.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => { setTab(b.dataset.goto); try { history.replaceState(null, "", "#" + b.dataset.goto); } catch(e){} window.scrollTo({top:0, behavior:"smooth"}); }));
 setTab(location.hash.slice(1));
 if (document.body.dataset.tab === "excel") document.title = tituloOrig;
 
@@ -1078,7 +1446,7 @@ $("#dl").onclick = async () => {
 
   $("#dl").disabled = true; m.textContent = "Gerando a planilha…";
   try {
-    const blob = await buildXlsx();
+    const blob = docTipo === "titulos" ? await buildXlsxTit() : await buildXlsx();
     if (downloads) await downloads.save({filename: fileName(), data: blob});
     else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fileName(); document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
     m.textContent = "Planilha gerada.";
