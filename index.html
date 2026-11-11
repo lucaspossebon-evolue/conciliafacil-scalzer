@@ -191,6 +191,32 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
 .gate p{margin:0;color:var(--muted);font-size:14px}
 .gate .msg{min-height:1.4em}
 .sair{margin-left:auto;align-self:flex-start}
+.topacts{margin-left:auto;align-self:flex-start;display:flex;gap:8px}
+.topacts .sair{margin-left:0}
+.helpbtn{display:inline-flex;align-items:center;gap:6px}
+.helpbtn svg{width:16px;height:16px}
+.helpov{position:fixed;inset:0;z-index:60;background:rgba(18,17,40,.45);display:flex;justify-content:flex-end}
+.helppanel{width:min(520px,100%);height:100%;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(18px + env(safe-area-inset-bottom,0px))}
+.helphead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.helphead h2{margin:0;font-size:19px;color:var(--navy);flex:1}
+.helpsearch{border:2px solid var(--sky);border-radius:10px;padding:11px 12px;font-size:15px;background:var(--field);color:var(--ink);width:100%}
+.helpsearch:focus{outline:none;box-shadow:0 0 0 3px var(--sky-soft)}
+.helptags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
+.helptags button{appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+.helptags button:hover{border-color:var(--sky)}
+.helpcount{font-size:12.5px;color:var(--muted);margin:4px 0 8px}
+.helplist{overflow:auto;flex:1;margin:0 -4px;padding:0 4px}
+.helpitem{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--surface)}
+.helpitem summary{cursor:pointer;padding:11px 12px;font-weight:700;font-size:14.5px;list-style:none;display:flex;gap:8px}
+.helpitem summary::-webkit-details-marker{display:none}
+.helpitem summary::before{content:"+";color:var(--sky);font-weight:800;width:12px;flex:none}
+.helpitem[open] summary::before{content:"–"}
+.helpitem .ans{padding:0 12px 12px 32px;font-size:14px;color:var(--ink)}
+.helpitem .ans p{margin:0 0 6px}
+.helpitem .cat{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:8px;white-space:nowrap}
+.helpitem mark{background:var(--warn-soft);color:inherit;border-radius:3px}
+.helpempty{color:var(--muted);font-size:14px;padding:18px 4px}
+.helpfoot{border-top:1px solid var(--line);padding-top:10px;margin-top:8px;font-size:12.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -215,7 +241,10 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
       <p class="only-excel">Envie as fotos ou o PDF do extrato. O sistema lê cada folha, confere os saldos de cada dia e gera a planilha pronta para o lançamento contábil.</p>
       <p class="only-pdf">Converta extratos escaneados ou fotografados pelo cliente em PDF com texto selecionável, no padrão do internet banking, pronto para importação no sistema contábil.</p>
     </div>
-    <button class="btn ghost sm sair" id="sair" type="button" style="padding:7px 12px;font-size:13px">Sair</button>
+    <div class="topacts">
+      <button class="btn sky sm helpbtn" id="ajuda" type="button" style="padding:7px 12px;font-size:13px" aria-haspopup="dialog" title="Pesquisa rápida de dúvidas (tecla F1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Ajuda</button>
+      <button class="btn ghost sm sair" id="sair" type="button" style="padding:7px 12px;font-size:13px">Sair</button>
+    </div>
   </header>
   <nav class="tabs" role="tablist" aria-label="Tipo de arquivo">
     <button class="tab" role="tab" type="button" data-tab="excel" aria-selected="true"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/></svg></span><span><b>Planilha para lançamento</b><small>Lê o extrato ou o relatório de títulos e gera o Excel para importar no sistema contábil</small></span></button>
@@ -296,8 +325,19 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
   </div>
   <footer class="site">
     <div class="credit">Desenvolvido por <a class="ev" href="https://evoluetreinamento.com.br" target="_blank" rel="noopener"><span class="dot"></span>EVOLUE</a> Treinamento e Desenvolvimento · exclusivo para Scalzer Assessoria Contábil</div>
-    <div class="small">ConciliaFácil · versão 1.2</div>
+    <div class="small">ConciliaFácil · versão 1.3</div>
   </footer>
+</div>
+
+<div class="helpov hidden" id="helpov">
+  <aside class="helppanel" role="dialog" aria-modal="true" aria-labelledby="helpT">
+    <div class="helphead"><h2 id="helpT">Pesquisa rápida</h2><button class="icon" id="helpclose" type="button" aria-label="Fechar a ajuda" title="Fechar (Esc)">✕</button></div>
+    <input class="helpsearch" id="helpq" type="search" placeholder="Digite sua dúvida: senha, dia não fecha, títulos, data…" aria-label="Pesquisar na ajuda" autocomplete="off">
+    <div class="helptags" id="helptags" aria-label="Assuntos"></div>
+    <div class="helpcount" id="helpcount" role="status" aria-live="polite"></div>
+    <div class="helplist" id="helplist"></div>
+    <div class="helpfoot">Não encontrou? Fale com a Evolue: <a href="mailto:lucas@evoluetreinamento.com.br">lucas@evoluetreinamento.com.br</a></div>
+  </aside>
 </div>
 
 <script>
@@ -1455,6 +1495,54 @@ $("#dl").onclick = async () => {
     m.textContent = e?.code==="declined" ? "Download cancelado." : e?.code==="rate_limited" ? "Aguarde alguns segundos e clique de novo." : "Não foi possível gerar a planilha. Tente de novo.";
   } finally { refreshButtons(); }
 };
+
+
+/* ---------- Pesquisa rápida (Ajuda) ---------- */
+const AJUDA = [
+  {c:"Acesso", q:"Esqueci ou perdi a senha de acesso", a:["A senha é definida pela Evolue. Peça a senha atual por e-mail ou WhatsApp.","Quando a Evolue troca a senha, quem estava com a antiga volta automaticamente para a tela de acesso."], k:"senha login entrar bloqueado acesso"},
+  {c:"Acesso", q:"Como não precisar digitar a senha toda vez", a:["Na tela de acesso, deixe marcado “Lembrar neste computador”.","Em computador compartilhado, use o botão Sair ao terminar: ele apaga a senha salva."], k:"lembrar salvar senha sair computador"},
+  {c:"Acesso", q:"A tela parece antiga depois de uma atualização", a:["O navegador guardou a versão anterior. Recarregue a página com Ctrl+F5."], k:"atualizar versão cache recarregar"},
+  {c:"Envio", q:"Quais arquivos posso enviar", a:["Extrato: fotos (JPG, PNG) ou PDF.","Títulos por período: o PDF do “Relatório – Títulos por Período” do Sicoob (ou fotos dele).","Escolha o Tipo de documento antes de enviar: trocar o tipo limpa a lista."], k:"foto pdf jpg png arquivo formato enviar upload"},
+  {c:"Envio", q:"Posso enviar as folhas fora de ordem ou repetidas?", a:["Sim. O sistema organiza as folhas pela data e marca a folha repetida como “Repetida – ignorada”; ela não entra na conta.","Para mudar a ordem manualmente, use as setas ↑ ↓ da folha."], k:"ordem repetida duplicada folha sequência"},
+  {c:"Leitura", q:"Qual modo de leitura escolher", a:["Rápida: fotos retas e nítidas ou PDF do banco.","Equilibrada: uso diário (padrão).","Precisa: fotos difíceis ou quando algum dia não fechar. O botão ↻ da folha relê nesse modo."], k:"modo rápida equilibrada precisa modelo velocidade"},
+  {c:"Conferência", q:"Um dia não fecha com o extrato", a:["A linha do dia fica em vermelho e os lançamentos dele ficam pendentes.","Procure o valor lido errado (compare com a foto) e corrija na lista; a conferência recalcula na hora.","Se não achar, releia a folha com ↻ (modo Precisa). Também pode estar faltando uma folha."], k:"saldo diferença não fecha erro dia vermelho conferência"},
+  {c:"Conferência", q:"O que significa Pendente, Aprovado e Conferido", a:["Pendente (amarelo): o sistema viu um possível erro; o motivo aparece embaixo.","Aprovado (verde): alguém conferiu e aprovou com ✓.","Conferido (sem cor): sem problema encontrado."], k:"status pendente aprovado conferido cor amarelo verde aprovar"},
+  {c:"Conferência", q:"Remetente cortado na foto", a:["O nome ficou no pé da folha e não apareceu na folha seguinte. Digite o nome na coluna Remetente e aprove."], k:"remetente nome cortado faltando"},
+  {c:"Datas", q:"A data saiu com o ano errado", a:["O ano vem do período do cabeçalho do extrato (“Extrato de … até …”); a data de impressão do rodapé é ignorada.","Se o ano foi corrigido automaticamente, o lançamento aparece como “Ano ajustado pelo período do extrato”: confira e aprove.","Digite datas como dd/mm/aaaa. Se digitar só dd/mm, o ano segue a sequência dos lançamentos."], k:"data ano período rodapé impressão errada formato"},
+  {c:"Conferência", q:"Como mudar a ordem dos lançamentos", a:["Use ↑ ↓ na linha. Ordenar por data volta tudo para a ordem do extrato.","A planilha sai na ordem que estiver na tela."], k:"ordem sequência ordenar mover setas"},
+  {c:"Planilha", q:"O que vem na planilha do extrato", a:["Aba Lançamentos: Data, Folha, Documento, Histórico (histórico + remetente), CPF/CNPJ, Crédito, Débito, Conta Débito, Conta Crédito e Observação, sem linha de total.","Aba Conferência: saldo de cada dia e resumo do período (saldo inicial e final)."], k:"excel planilha colunas lançamentos baixar download"},
+  {c:"Títulos", q:"Quais títulos entram no relatório de títulos", a:["Só as liquidações: grupos 51 (caixa/dinheiro), 58 (compensação), 68 (débito em conta) e 215 (Intercredis).","Os grupos 11 (baixa por decurso de prazo) e 82 (baixa a pedido do cedente) não entram; aparecem só em uma nota."], k:"títulos grupos 51 58 68 215 11 82 liquidação baixa sicoob relatório"},
+  {c:"Títulos", q:"Colunas da planilha de títulos", a:["Dt. Baixa · Sacado / Cliente · Seu Número / Nº documento · Valor (R$) · Vlr Mora · Vlr Desc. · Vlr Baixado.","Nas liquidações, Dt. Baixa vem de Dt. Liquid. e Vlr Baixado vem de Vlr. Cobrado."], k:"títulos colunas sacado seu número mora desconto baixado"},
+  {c:"Títulos", q:"Um grupo de títulos não fecha com o relatório", a:["Normalmente falta uma página do PDF. Envie o relatório completo.","Se for foto, confira o valor marcado como pendente (valor + mora − desconto deve ser igual ao valor baixado)."], k:"títulos grupo total diferença não fecha"},
+  {c:"PDF pesquisável", q:"Para que serve a aba PDF pesquisável", a:["Transforma o extrato escaneado ou fotografado em PDF com texto selecionável, no padrão do internet banking.","Não gera planilha. Só gera o PDF quando todos os dias fecham. Vale apenas para extrato bancário."], k:"pdf pesquisável texto selecionável escaneado ocr importar"},
+  {c:"Erros", q:"Mensagem “Muitas leituras seguidas” ou “sem créditos”", a:["Muitas leituras seguidas: aguarde um minuto e use ↻ na folha.","Sem créditos ou limite atingido: o limite mensal de leitura por IA acabou. Avise a Evolue.","PDF do relatório de títulos não usa IA e continua funcionando."], k:"erro limite créditos rate limit muitas leituras"},
+  {c:"Erros", q:"Mensagem “Sem conexão com o serviço”", a:["Verifique a internet.","Abra o sistema pelo link no navegador do computador; a pré-visualização de outros aplicativos pode bloquear a conexão."], k:"conexão internet offline erro serviço"}
+];
+const semAcento = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const marcar = (txt, termos) => { let h = esc(txt); termos.forEach(t => { if (t.length < 2) return; const re = new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")", "gi"); h = h.replace(re, "<mark>$1</mark>"); }); return h; };
+function renderAjuda(){
+  const q = $("#helpq").value.trim();
+  const termos = semAcento(q).split(/\s+/).filter(Boolean);
+  const itens = AJUDA.map(it => ({it, base: semAcento([it.c, it.q, it.a.join(" "), it.k].join(" "))}))
+    .filter(x => termos.every(t => x.base.includes(t))).map(x => x.it);
+  const visTermos = q.split(/\s+/).filter(Boolean);
+  $("#helplist").innerHTML = itens.length ? itens.map((it, i) => `<details class="helpitem"${termos.length && i < 3 ? " open" : ""}><summary><span>${marcar(it.q, visTermos)}</span><span class="cat">${esc(it.c)}</span></summary><div class="ans">${it.a.map(p => `<p>${marcar(p, visTermos)}</p>`).join("")}</div></details>`).join("")
+    : `<div class="helpempty">Nada encontrado para “${esc(q)}”. Tente outra palavra, como <b>senha</b>, <b>saldo</b>, <b>data</b> ou <b>títulos</b>.</div>`;
+  $("#helpcount").textContent = q ? `${itens.length} resultado${itens.length===1?"":"s"}` : `${AJUDA.length} assuntos`;
+}
+$("#helptags").innerHTML = [...new Set(AJUDA.map(a=>a.c))].map(c => `<button type="button" data-tag="${esc(c)}">${esc(c)}</button>`).join("");
+$("#helptags").querySelectorAll("button").forEach(b => b.onclick = () => { $("#helpq").value = b.dataset.tag; renderAjuda(); $("#helpq").focus(); });
+let ajudaVolta = null;
+const abrirAjuda = () => { ajudaVolta = document.activeElement; $("#helpov").classList.remove("hidden"); renderAjuda(); $("#helpq").focus(); };
+const fecharAjuda = () => { $("#helpov").classList.add("hidden"); if (ajudaVolta && ajudaVolta.focus) ajudaVolta.focus(); };
+$("#ajuda").onclick = abrirAjuda;
+$("#helpclose").onclick = fecharAjuda;
+$("#helpov").addEventListener("click", e => { if (e.target.id === "helpov") fecharAjuda(); });
+$("#helpq").addEventListener("input", renderAjuda);
+document.addEventListener("keydown", e => {
+  if (e.key === "F1") { e.preventDefault(); abrirAjuda(); }
+  else if (e.key === "Escape" && !$("#helpov").classList.contains("hidden")) fecharAjuda();
+});
 
 renderPages();
 })();
