@@ -705,7 +705,7 @@ async function readPages(list, tier){
           if (tier === "complex") opts.cache = false;
           res = await sample.json(PROMPT, opts);
         }
-        if (!res || !Array.isArray(res.itens)) throw {code:"invalid_json"};
+        if (!res || !Array.isArray(docTipo === "titulos" ? res.grupos : res.itens)) throw {code:"invalid_json"};
         p.result = docTipo === "titulos" ? normalizeTit(res) : normalize(res); p.status="ok";
       } catch(e){
         p.status="erro"; p.error = errText(e?.code);
