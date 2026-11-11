@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --navy:#2D295B; --sky:#2DAAE1; --sky-soft:#E3F3FB;
@@ -145,6 +146,13 @@ td.deb{color:var(--debit)}
 h3{font-size:15px;margin:22px 0 10px}
 .foot{color:var(--muted);font-size:12.5px;margin-top:30px;max-width:80ch}
 .hidden{display:none!important}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 24px;border-bottom:1px solid var(--line)}
+.tab{appearance:none;background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:10px 14px;font:inherit;font-weight:700;font-size:15px;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--sky)}
+.tab:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+body[data-tab="excel"] .only-pdf, body[data-tab="pdf"] .only-excel{display:none!important}
+.fields.two{grid-template-columns:1fr 1fr;margin-top:12px}
+@media (max-width:640px){.fields.two{grid-template-columns:1fr}}
 .brand{display:flex;flex-direction:column;gap:2px}
 .brand .sub{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sky)}
 .credit{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
@@ -164,7 +172,7 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-<body>
+<body data-tab="excel">
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateT">
   <form class="card" id="gateForm" autocomplete="on">
     <div class="logo"><img src="" id="gateLogo" alt="Scalzer Assessoria Contábil" style="height:40px;width:auto;display:block"></div>
@@ -181,11 +189,16 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
   <header class="top">
     <div class="logo"><img src="data:image/png;base64,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" alt="Scalzer Assessoria Contábil"></div>
     <div>
-      <div class="brand"><span class="sub">Extrato bancário para Excel</span><h1>ConciliaFácil</h1></div>
-      <p>Envie as fotos ou o PDF do extrato. O sistema lê cada folha, confere os saldos de cada dia e gera a planilha pronta para o lançamento contábil.</p>
+      <div class="brand"><span class="sub only-excel">Extrato bancário para Excel</span><span class="sub only-pdf">Extrato digitalizado para PDF pesquisável</span><h1>ConciliaFácil</h1></div>
+      <p class="only-excel">Envie as fotos ou o PDF do extrato. O sistema lê cada folha, confere os saldos de cada dia e gera a planilha pronta para o lançamento contábil.</p>
+      <p class="only-pdf">Converta extratos escaneados ou fotografados pelo cliente em PDF com texto selecionável, no padrão do internet banking, pronto para importação no sistema contábil.</p>
     </div>
     <button class="btn ghost sm sair" id="sair" type="button" style="padding:7px 12px;font-size:13px">Sair</button>
   </header>
+  <nav class="tabs" role="tablist" aria-label="Tipo de arquivo">
+    <button class="tab" role="tab" type="button" data-tab="excel" aria-selected="true">Planilha para lançamento</button>
+    <button class="tab" role="tab" type="button" data-tab="pdf" aria-selected="false">PDF pesquisável</button>
+  </nav>
 
   <div class="grid">
     <aside>
@@ -224,24 +237,38 @@ footer.site .small{font-size:12px;color:var(--muted);max-width:70ch}
         <div id="result" class="empty"><b>Nenhum extrato lido ainda</b>Envie as folhas e clique em “Ler extrato”. A conferência dos saldos aparece aqui.</div>
       </section>
       <section class="step">
-        <h2><span class="num">3</span>Gerar a planilha</h2>
-        <p class="hint">O arquivo sai com as abas Lançamentos (sem linha de total, pronta para importar) e Conferência (saldos por dia e resumo do período).</p>
+        <h2><span class="num">3</span><span class="only-excel">Gerar a planilha</span><span class="only-pdf">Gerar o PDF pesquisável</span></h2>
+        <p class="hint only-pdf">O PDF sai com o texto real (selecionável), no layout do extrato do internet banking: data, documento, histórico, valor e saldo do dia. Só é gerado quando todos os dias fecham com o extrato.</p>
+        <p class="hint only-excel">O arquivo sai com as abas Lançamentos (sem linha de total, pronta para importar) e Conferência (saldos por dia e resumo do período).</p>
         <div class="fields">
           <label class="field">Cliente (nome no arquivo)<input id="cliente" placeholder="Ex.: Sergio Garcia Material de Construção"></label>
           <label class="field">Data inicial do período<input id="dataIni" inputmode="numeric" placeholder="dd/mm/aaaa"></label>
           <label class="field">Saldo inicial do período (R$)<input id="saldoIni" inputmode="decimal" placeholder="Lido do extrato"></label>
         </div>
         <div class="row">
-          <button class="btn" id="dl" disabled>Baixar Excel</button>
+          <button class="btn only-excel" id="dl" disabled>Baixar Excel</button>
         </div>
-        <div class="msg" id="dlmsg" role="status" aria-live="polite"></div>
+        <div class="msg only-excel" id="dlmsg" role="status" aria-live="polite"></div>
+        <div class="only-pdf">
+          <div class="fields two">
+            <label class="field">Instituição<input id="pInst" placeholder="Ex.: SICOOB"></label>
+            <label class="field">Cooperativa / agência<input id="pCoop" placeholder="Ex.: 3007-4 / SICOOB CONEXAO"></label>
+            <label class="field">Conta / titular<input id="pConta" placeholder="Ex.: 52.304-6 / DRAGO CARVAO LTDA"></label>
+            <label class="field">Período<input id="pPeriodo" placeholder="Ex.: 01/10/2024 - 31/10/2024"></label>
+            <label class="field">Emissão do extrato original<input id="pEmissao" placeholder="Ex.: 05/11/2024 09:46:49"></label>
+          </div>
+          <div class="row">
+            <button class="btn" id="dlpdf" type="button" disabled>Baixar PDF pesquisável</button>
+          </div>
+          <div class="msg" id="pdfmsg" role="status" aria-live="polite"></div>
+        </div>
       </section>
       <p class="foot">A leitura das folhas é feita por IA. Confira sempre os saldos por dia: quando todos os dias fecham com diferença zero, a leitura está correta.</p>
     </main>
   </div>
   <footer class="site">
     <div class="credit">Desenvolvido por <a class="ev" href="https://evoluetreinamento.com.br" target="_blank" rel="noopener"><span class="dot"></span>EVOLUE</a> Treinamento e Desenvolvimento · exclusivo para Scalzer Assessoria Contábil</div>
-    <div class="small">ConciliaFácil · versão 1.0</div>
+    <div class="small">ConciliaFácil · versão 1.1</div>
   </footer>
 </div>
 
@@ -459,6 +486,7 @@ function refreshButtons(){
   $("#read").disabled = busy || !canRead || !pages.some(p=>p.status!=="ok");
   $("#clear").disabled = busy || !pages.length;
   $("#dl").disabled = busy || !rows.length;
+  $("#dlpdf").disabled = busy || !rows.length;
 }
 
 /* ---------- leitura ---------- */
@@ -577,7 +605,9 @@ function normalize(res){
     const i0 = normDate(String(res.periodo.inicio||"")), f0 = normDate(String(res.periodo.fim||""));
     periodo = {inicio: ymd(i0) ? i0 : "", fim: ymd(f0) ? f0 : ""};
   }
-  return {saldo_anterior:sa, continuacao_topo:ct, itens:it, periodo};
+  const cb = res.cabecalho && typeof res.cabecalho === "object" ? res.cabecalho : null;
+  const cab = cb ? {inst:String(cb.instituicao||"").trim(), coop:String(cb.cooperativa||"").trim(), conta:String(cb.conta||"").trim(), emissao:String(cb.emissao||"").trim()} : null;
+  return {saldo_anterior:sa, continuacao_topo:ct, itens:it, periodo, cab};
 }
 
 /* ---------- montagem ---------- */
@@ -635,6 +665,9 @@ function assemble(){
   rows.forEach(x => { x.uid = ++uidSeq; const k = rowKey(x); if (prevAp[k]) { x.aprovado = true; prevAp[k]--; } else x.aprovado = false; });
   sortByDate();
   renderPages();
+  const cab = {};
+  pages.forEach(p => { const c = p.status==="ok" && !p.dup && p.result.cab; if (!c) return; ["inst","coop","conta","emissao"].forEach(k => { if (!cab[k] && c[k]) cab[k] = c[k]; }); });
+  [["pInst","inst"],["pCoop","coop"],["pConta","conta"],["pEmissao","emissao"]].forEach(([id,k]) => { const el = $("#"+id); if (cab[k] && (!el.value || el.dataset.auto==="1")) { el.value = cab[k]; el.dataset.auto = "1"; } });
   const si = $("#saldoIni");
   if (sAnt !== null && (!si.value || si.dataset.auto==="1")) { si.value = brl(sAnt); si.dataset.auto="1"; }
   const di = $("#dataIni");
@@ -670,6 +703,7 @@ function assemble(){
   Object.keys(saldos).forEach(k => { const nk = fixYear(k, refS); s2[nk] = saldos[k]; if (ymd(nk)) refS = nk; });
   saldos = s2;
   sortByDate();
+  autoPeriodo();
   renderResult();
 }
 $("#saldoIni").addEventListener("input", e => { e.target.dataset.auto="0"; renderResult(); });
@@ -908,6 +942,136 @@ function fileName(){
   const p = R.days.length ? R.days[0].d.slice(3).replace("/","-") : "extrato";
   return `lancamentos_${cli?cli+"_":""}${p}.xlsx`;
 }
+/* ---------- abas ---------- */
+function setTab(t){
+  t = t === "pdf" ? "pdf" : "excel";
+  document.body.dataset.tab = t;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  document.title = t === "pdf" ? "ConciliaFácil – PDF pesquisável – Scalzer" : "ConciliaFácil – Scalzer";
+}
+const tituloOrig = document.title;
+document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => { setTab(b.dataset.tab); try { history.replaceState(null, "", "#" + b.dataset.tab); } catch(e){} }));
+window.addEventListener("hashchange", () => setTab(location.hash.slice(1)));
+setTab(location.hash.slice(1));
+if (document.body.dataset.tab === "excel") document.title = tituloOrig;
+
+/* ---------- PDF pesquisável ---------- */
+function autoPeriodo(){
+  const el = $("#pPeriodo"); if (!el || (el.value && el.dataset.auto !== "1")) return;
+  let v = "";
+  if (periodoIni && periodoFim) v = `${periodoIni} - ${periodoFim}`;
+  else {
+    const ks = rows.map(r => ymd(r.data)).filter(Boolean).sort();
+    if (!ks.length) return;
+    const a = ks[0], b = ks[ks.length-1];
+    const f = k => `${k.slice(6,8)}/${k.slice(4,6)}/${k.slice(0,4)}`;
+    if (a.slice(0,6) === b.slice(0,6)) { const y = +a.slice(0,4), m = +a.slice(4,6); v = `01/${pad2(m)}/${y} - ${pad2(new Date(Date.UTC(y,m,0)).getUTCDate())}/${pad2(m)}/${y}`; }
+    else v = `${f(a)} - ${f(b)}`;
+  }
+  el.value = v; el.dataset.auto = "1";
+}
+["pInst","pCoop","pConta","pPeriodo","pEmissao"].forEach(id => $("#"+id).addEventListener("input", e => { e.target.dataset.auto = "0"; }));
+const sinalBRL = v => `R$ ${brl(Math.abs(v))}${v < 0 ? "D" : "C"}`;
+function buildPdf(){
+  const R = recon();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+  const W = 595.28, H = 841.89, M = 40;
+  const xD = M+8, xDoc = M+62, xH = M+150, xV = W-M-8, wH = xV - 55 - xH;
+  const DARK = [11,59,60], RED = [224,36,94], BLACK = [0,0,0];
+  const inst = $("#pInst").value.trim(), coop = $("#pCoop").value.trim(), conta = $("#pConta").value.trim(), per = $("#pPeriodo").value.trim(), emi = $("#pEmissao").value.trim();
+  const hoje = new Date().toLocaleDateString("pt-BR");
+  let y = 0;
+  const topo = () => {
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...BLACK);
+    if (emi) doc.text(emi, M-10, 25);
+    doc.text(`${inst ? inst + " | " : ""}Extrato de conta corrente`, W/2, 25, {align:"center"});
+  };
+  const cab = () => {
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...DARK);
+    doc.text("Data", xD, y); doc.text("Documento", xDoc, y); doc.text("Histórico", xH, y); doc.text("Valor", xV, y, {align:"right"});
+    y += 22;
+  };
+  const novaPag = () => { doc.addPage(); topo(); y = 52; cab(); };
+  const linha = (d, docu, hist, det, txt, red) => {
+    doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    const hl = doc.splitTextToSize(hist || "", wH - 60);
+    doc.setFontSize(7);
+    const dl = [...hl.slice(1), ...det.filter(Boolean)].flatMap(t => doc.splitTextToSize(String(t), wH));
+    if (y + 16 + 9*dl.length + 8 > H - 45) novaPag();
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...DARK);
+    if (d) doc.text(d, xD, y);
+    if (docu) doc.text(String(docu).slice(0,16), xDoc, y);
+    doc.text(hl[0] || "", xH, y);
+    doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...(red ? RED : DARK));
+    doc.text(txt, xV, y, {align:"right"});
+    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...DARK);
+    let yy = y; dl.forEach(t => { yy += 9; doc.text(t, xH, yy); });
+    y = yy + 22;
+  };
+  topo(); y = 62;
+  doc.setTextColor(...DARK);
+  if (inst) { doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.text(inst.toUpperCase(), M, y); y += 28; }
+  doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.text("EXTRATO DE CONTA CORRENTE", M, y);
+  if (emi) { doc.setFont("helvetica","normal"); doc.setFontSize(12); doc.text(emi.includes(" - ") ? emi : emi.replace(/\s+/, " - "), W-M, y, {align:"right"}); }
+  y += 22; doc.setFont("helvetica","normal"); doc.setFontSize(11);
+  [["Cooperativa:", coop], ["Conta:", conta], ["Periodo:", per]].forEach(([a,b]) => { if (!b) return; doc.text(a, M, y); doc.text(b, W-M, y, {align:"right"}); y += 14; });
+  y += 16; doc.setFont("helvetica","bold"); doc.text("HISTÓRICO DE MOVIMENTAÇÃO", M, y); y += 24; cab();
+  const dm = d => String(d || "").slice(0,5);
+  linha(dm(saldoAntData || anchorDate()), "", "SALDO ANTERIOR", [], sinalBRL(R.start), R.start < 0);
+  R.days.forEach(day => {
+    rows.filter(r => r.data === day.d).forEach(r => {
+      linha(dm(r.data), r.doc, r.hist, [r.nome, r.cpf, r.obs], `R$ ${brl(r.valor)}${r.dc}`, r.dc === "D");
+    });
+    const s = day.ext !== null ? day.ext : day.calc;
+    linha("", "", "SALDO DO DIA", [], sinalBRL(s), s < 0);
+  });
+  if (y + 130 > H - 45) { doc.addPage(); topo(); y = 62; }
+  doc.setDrawColor(201,207,214); doc.line(M, y-10, W-M, y-10); y += 8;
+  doc.setTextColor(...BLACK); doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.text("RESUMO", M, y); y += 22;
+  doc.setFont("helvetica","normal"); doc.setFontSize(9);
+  const fim = R.lastExt ? R.lastExt.ext : R.final;
+  [["Saldo anterior:", brl(R.start)], ["Total de créditos:", brl(R.tc)], ["Total de débitos:", brl(R.td)], ["Saldo em conta corrente:", brl(fim)]].forEach(([a,b]) => {
+    doc.text(a, M+8, y); doc.text(b, xV, y, {align:"right"}); y += 18;
+  });
+  const n = doc.getNumberOfPages();
+  for (let p = 1; p <= n; p++){
+    doc.setPage(p); doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...BLACK);
+    doc.text(`Transcrição digital de extrato digitalizado, gerada em ${hoje} pelo ConciliaFácil – Scalzer Assessoria Contábil`, M-10, H-20);
+    doc.text(`${p}/${n}`, W-M+10, H-20, {align:"right"});
+  }
+  doc.setProperties({title: `Extrato de conta corrente${conta ? " – " + conta : ""}${per ? " – " + per : ""}`});
+  return doc.output("blob");
+}
+function pdfName(){
+  const R = recon();
+  const base = ($("#cliente").value.trim() || $("#pConta").value.split("/").pop() || "").trim();
+  const cli = base.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_|_$/g,"").toLowerCase();
+  const p = R.days.length ? R.days[0].d.slice(3).replace("/","-") : "periodo";
+  return `extrato_pesquisavel_${cli ? cli + "_" : ""}${p}.pdf`;
+}
+$("#dlpdf").onclick = async () => {
+  const m = $("#pdfmsg"); m.classList.remove("err");
+  const fail = t => { m.textContent = t; m.classList.add("err"); };
+  if (!window.jspdf) return fail("Não foi possível carregar o gerador de PDF. Recarregue a página.");
+  const R = recon();
+  if (!R.iniOk) return fail("Informe o saldo inicial do período antes de gerar o PDF.");
+  const bad = R.days.filter(x => x.diff !== null && x.diff !== 0).length;
+  if (bad) return fail(`${bad} dia(s) não fecham com o extrato. Corrija na conferência (passo 2) para o PDF sair igual ao original.`);
+  const inval = rows.filter(r => !ymd(r.data)).length;
+  if (inval) return fail(`${inval} lançamento(s) com data inválida. Corrija na conferência (passo 2) antes de gerar o PDF.`);
+  $("#dlpdf").disabled = true; m.textContent = "Gerando o PDF…";
+  try {
+    const blob = buildPdf();
+    if (downloads) await downloads.save({filename: pdfName(), data: blob});
+    else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = pdfName(); document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+    m.textContent = "PDF gerado. O texto pode ser selecionado e importado no sistema contábil.";
+  } catch(e){
+    m.classList.add("err");
+    m.textContent = e?.code==="declined" ? "Download cancelado." : e?.code==="rate_limited" ? "Aguarde alguns segundos e clique de novo." : "Não foi possível gerar o PDF. Tente de novo.";
+  } finally { refreshButtons(); }
+};
+
 $("#dl").onclick = async () => {
   const m = $("#dlmsg"); m.classList.remove("err");
   if (!window.ExcelJS){ m.textContent="Não foi possível carregar o gerador de planilhas. Recarregue a página."; m.classList.add("err"); return; }
